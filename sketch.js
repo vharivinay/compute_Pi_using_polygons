@@ -1,3 +1,11 @@
+const capturer = new CCapture({
+  framerate: 60,
+  format: "webm",
+  name: "polyPI",
+  quality: 100,
+  verbose: true,
+});
+
 var rad = 450;
 var inSides = 3;
 var outSides = 3;
@@ -5,15 +13,19 @@ var piMin, piMax;
 let minPi = [];
 let maxPi = [];
 
+let p5Canvas;
+
 function setup() {
-  createCanvas(900, 900);
+  p5Canvas = createCanvas(900, 900);
+  frameRate(60);
   angleMode(DEGREES);
   ellipseMode(CENTER);
   textSize(24);
 }
 
 function draw() {
-  background("#b5fbff");
+  if (frameCount === 1) capturer.start();
+  background(30);
   translate(width / 2, height / 2);
   noFill();
 
@@ -33,8 +45,8 @@ function draw() {
   minPi.push(piMin);
   maxPi.push(piMax);
 
-  fill(0);
-  stroke(0);
+  fill(255);
+  stroke(255);
   strokeWeight(1);
   text("Pi_Min = " + str(piMin), -width / 2 + 25, -height / 2 + 25);
   text("Pi_Max = " + str(piMax), -width / 2 + 25, -height / 2 + 50);
@@ -48,10 +60,14 @@ function draw() {
 
   plotGraph(width, height, minPi, maxPi);
 
+  capturer.capture(p5Canvas.canvas);
+  if (frameCount === 1400) {
+    noLoop();
+    capturer.stop();
+    capturer.save();
+  }
+
   if (frameCount % 50 === 0) {
-    if (frameCount === 1400) {
-      noLoop();
-    }
     inSides += 1;
     outSides += 1;
   }
